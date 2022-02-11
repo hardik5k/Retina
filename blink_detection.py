@@ -10,6 +10,7 @@ import time
 from datetime import datetime
 import dlib
 import cv2
+import math
 
 class Blink:
     def __init__(self, startTime, duration):
@@ -17,6 +18,8 @@ class Blink:
         self.duration = duration
     
 STARTING_TIME = datetime.now()
+TOTAL_RUNNING_TIME = 15
+CURRENT_RUNNING_TIME = TOTAL_RUNNING_TIME
 STATE = "RUNNING"
 TOTAL_BLINKS = 0
 EYE_AR_THRESH = 0.28
@@ -24,11 +27,13 @@ EYE_AR_CONSEC_FRAMES = 2
 COUNTER = 0
 ASPECT_RATIO_VECTOR = []
 
-def getPauseDuration():
-    duration = getDuration(PAUSE_START_TIME, datetime.now())
-    if (duration > 120):
+def getPauseDuration(pause):
+    global CURRENT_RUNNING_TIME
+    duration = getDuration(pause, datetime.now())
+    if (duration > 60):
         return True
-    EXIT_TIME = STARTING_TIME + duration
+    CURRENT_RUNNING_TIME += duration
+    print("paused for ", duration)
     return False
 
 
@@ -76,6 +81,8 @@ fileStream = False
 time.sleep(1.0)
 
 while True:
+    if (getDuration( STARTING_TIME, datetime.now()) >= CURRENT_RUNNING_TIME):
+        break
     # Read the frame, resize it and convert to grayscale
     frame = vs.read()
     frame = imutils.resize(frame, width = 450)
@@ -85,13 +92,15 @@ while True:
     faces = detector(gray, 0)
 
     if (len(faces) != 1):
-        STATE = "PAUSED"
-        print("WARNING: face count is not equal to 1. pausing frames... ")
-        PAUSE_START_TIME = datetime.now()
+        if (STATE != "PAUSED"):
+            STATE = "PAUSED"
+            print("WARNING: face count is not equal to 1. pausing frames... ")
+            PAUSE_START_TIME = datetime.now()
+        
 
     else:
-        #if (STATE == "PAUSED" and getPauseDuration()):
-            #break
+        if (STATE == "PAUSED" and getPauseDuration(PAUSE_START_TIME)):
+            break
         STATE = "RUNNING"
         face = faces[0]
         shape = predictor(gray, face)
@@ -131,10 +140,13 @@ while True:
         # show the frame
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
-
-    # if the `q` key was pressed, break from the loop
     if key == ord("q"):
         break
-# do a bit of cleanup
+
+BLINK_RATE = TOTAL_BLINKS/TOTAL_RUNNING_TIME
+MIN_RATE = 2
+MAX_RATE = 35
+DRYNESS = 1 - (BLINK_RATE - MIN_RATE)/(MAX_RATE - MIN_RATE)
+
 cv2.destroyAllWindows()
 vs.stop()
