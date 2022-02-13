@@ -24,8 +24,8 @@
         <h2 class="item">Screen time : 4.6 hrs</h2>
     </div>
     </div>
-    <div class="togglebutton previous">&larr;</div>
-    <div class="togglebutton next">&rarr;</div>
+    <div class="togglebutton previous" id="previous">&larr;</div>
+    <div class="togglebutton next" id="next">&rarr;</div>
     <div class="graph"></div>
     <div class="calender">
         <div class="togglebutton" id=1>Show Daily Data</div>
@@ -40,6 +40,36 @@
 
 
     <script>
+        const currentDate = new Date()
+        let blinkData = []
+
+        var prev = document.querySelector('#previous')
+        prev.addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() - 1)
+            setData()
+
+        })
+        var next = document.querySelector('#next')
+        prev.addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() + 1)
+            setData()
+        })
+
+        function setData() {
+            const datestring = currentDate.toISOString().slice(0, 10)
+            const currentData = blinkData[datestring]
+            let data = currentData.values().map((item) => item[0])
+            let xlabel = currentData.keys()
+        }
+        async function getData() {
+            const url = `http://localhost:5000/`;
+            const response = await fetch(url);
+            const data = await response.json();
+            blinkData = data
+            setData()
+        }
+        getData()
+
         function renderChart(data, xlabel) {
             window.Apex = {
                 chart: {
@@ -70,7 +100,6 @@
                         opacity: 1,
                     }
                 },
-                //colors: ["#3F51B5", '#2196F3'],
                 series: [{
                     name: "Blink Rate",
                     data: data
@@ -102,9 +131,6 @@
             chart.render();
 
         }
-        data = [1, 15, 26, 20, 33, 27]
-        xlabel = ['01/15/2002', '01/16/2002', '01/17/2002', '01/18/2002', '01/19/2002', '01/20/2002']
-        renderChart(data, xlabel);
     </script>
 </body>
 
