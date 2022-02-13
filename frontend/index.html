@@ -40,6 +40,67 @@
 
 
     <script>
+        window.Apex = {
+            chart: {
+                foreColor: 'wheat',
+                toolbar: {
+                    show: false
+                },
+            },
+            stroke: {
+                width: 3
+            },
+            tooltip: {
+                theme: 'dark'
+            }
+        };
+        var lineGraph = {
+            chart: {
+                height: 370,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                },
+                dropShadow: {
+                    enabled: true,
+                    top: 3,
+                    left: 2,
+                    blur: 4,
+                    opacity: 1,
+                }
+            },
+            series: [{
+                name: "Blink Rate",
+                data: []
+            }],
+            noData: {
+                text: 'Data not available'
+            },
+            markers: {
+                size: 6,
+                strokeWidth: 0,
+                hover: {
+                    size: 9
+                }
+            },
+            labels: [],
+            xaxis: {
+                tooltip: {
+                    enabled: false
+                }
+            },
+            annotations: {
+                yaxis: [{
+                    y: 8,
+                    y2: 22,
+                    borderColor: '#000',
+                    fillColor: '#3B7A57',
+                }]
+            }
+        }
+
+        var chart = new ApexCharts(document.querySelector('.graph'), lineGraph);
+
         const currentDate = new Date()
         const presentDate = new Date()
         let blinkData = []
@@ -52,7 +113,12 @@
             if (currentData === undefined) {
                 alert("No data found")
                 currentDate.setDate(currentDate.getDate() + 1)
-            } else setData(currentData, 1)
+            } else {
+                chart.updateSeries([{
+                    name: "Blink Rate",
+                    data: Object.values(currentData).map((item) => item[0])
+                }])
+            }
 
         })
         var next = document.querySelector('#next')
@@ -63,98 +129,40 @@
             if (currentData === undefined) {
                 alert("No data found")
                 currentDate.setDate(currentDate.getDate() - 1)
-            } else setData(currentData, 1)
+            } else {
+                chart.updateSeries([{
+                    name: "Blink Rate",
+                    data: Object.values(currentData).map((item) => item[0])
+                }])
+            }
         })
 
         function setData(currentData, x) {
             let data = Object.values(currentData).map((item) => item[0])
             let xlabel = Object.keys(currentData)
-            renderChart(data, xlabel, x)
+            chart.render();
+            chart.updateSeries([{
+                name: "Blink Rate",
+                data: data
+            }])
+            chart.updateOptions({
+                labels: xlabel
+            })
         }
         async function getData() {
             const url = `http://localhost:5000/`;
             const response = await fetch(url);
             const data = await response.json();
             blinkData = data
+            console.log(blinkData)
             const datestring = presentDate.toISOString().slice(0, 10)
+            console.log(datestring)
             const currentData = blinkData[datestring]
             if (currentData === undefined) {
                 alert("No data found")
             } else setData(currentData, 0)
         }
         getData()
-
-        function renderChart(data, xlabel, x = 0) {
-            window.Apex = {
-                chart: {
-                    foreColor: 'wheat',
-                    toolbar: {
-                        show: false
-                    },
-                },
-                stroke: {
-                    width: 3
-                },
-                tooltip: {
-                    theme: 'dark'
-                }
-            };
-            var lineGraph = {
-                chart: {
-                    height: 370,
-                    type: 'line',
-                    zoom: {
-                        enabled: false
-                    },
-                    dropShadow: {
-                        enabled: true,
-                        top: 3,
-                        left: 2,
-                        blur: 4,
-                        opacity: 1,
-                    }
-                },
-                series: [{
-                    name: "Blink Rate",
-                    data: data
-                }],
-                noData: {
-                    text: 'Data not available'
-                },
-                markers: {
-                    size: 6,
-                    strokeWidth: 0,
-                    hover: {
-                        size: 9
-                    }
-                },
-                labels: xlabel,
-                xaxis: {
-                    tooltip: {
-                        enabled: false
-                    }
-                },
-                annotations: {
-                    yaxis: [{
-                        y: 8,
-                        y2: 22,
-                        borderColor: '#000',
-                        fillColor: '#3B7A57',
-                    }]
-                }
-            }
-
-            var chart = new ApexCharts(document.querySelector('.graph'), lineGraph);
-            if (x == 1) {
-                chart.updateSeries([{
-                    name: "Blink Rate",
-                    data: data
-                }])
-                return
-            }
-            chart.render();
-
-        }
     </script>
 </body>
 
