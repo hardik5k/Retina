@@ -58,8 +58,10 @@
         function setData() {
             const datestring = currentDate.toISOString().slice(0, 10)
             const currentData = blinkData[datestring]
+            if (currentData === undefined) alert("No data found")
             let data = currentData.values().map((item) => item[0])
             let xlabel = currentData.keys()
+            renderChart(data, xlabel)
         }
         async function getData() {
             const url = `http://localhost:5000/`;
