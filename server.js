@@ -17,7 +17,7 @@ MongoClient.connect(url, function(err, db) {
 
         result.forEach((item) => {
                 if (blinkData[item.Date] !== undefined) {
-                    blinkData[item.Date][item.Time] = [item.BlinkRate, item.DrynessLevel]
+                    blinkData[item.Date][item.Time] = [parseInt(item.BlinkRate), item.DrynessLevel]
                 } else {
                     blinkData[item.Date] = {}
                 }
