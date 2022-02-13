@@ -198,7 +198,7 @@ client = pymongo.MongoClient()
 mydb = client["BlinksDatabase"]
 mycol = mydb["Blinkstats"]
 mydict = {"Time": start, "Date": str(
-    date.today()), "BlinkRate": round(BLINK_RATE), "DrynessLevel": round(DRYNESS)}
+    date.today()), "BlinkRate": round(BLINK_RATE), "DrynessLevel": round(DRYNESS,2)}
 mycol.insert_one(mydict)
 cv2.destroyAllWindows()
 vs.stop()
