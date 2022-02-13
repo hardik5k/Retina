@@ -16,6 +16,7 @@ import math
 import sys
 import logging
 import os
+import screen_brightness_control as sbc
 
 
 resttime = 10
@@ -182,10 +183,18 @@ while True:
     if key == ord("q"):
         break
 
-BLINK_RATE = (TOTAL_BLINKS/TOTAL_RUNNING_TIME)*60
+BLINK_RATE = TOTAL_BLINKS*60/TOTAL_RUNNING_TIME
 MIN_RATE = 2
 MAX_RATE = 35
+NORMAL_RATE_MIN = 12
+NORMAL_RATE_MAX = 15
 DRYNESS = 1 - (BLINK_RATE - MIN_RATE)/(MAX_RATE - MIN_RATE)
+
+if BLINK_RATE <= NORMAL_RATE_MIN - 5:
+	curr_brightness=sbc.get_brightness()
+	new_brightness=int(curr_brightness*4/5)
+	sbc.set_brightness(new_brightness)
+    
 client = pymongo.MongoClient()
 mydb = client["BlinksDatabase"]
 mycol = mydb["Blinkstats"]
