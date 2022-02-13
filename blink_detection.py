@@ -162,8 +162,7 @@ while True:
         if (len(ASPECT_RATIO_VECTOR) >= 60):
             ASPECT_RATIO_VECTOR.pop(0)
 
-        EYE_AR_THRESH = sum(ASPECT_RATIO_VECTOR) / \
-            len(ASPECT_RATIO_VECTOR) - 0.06
+        EYE_AR_THRESH = sum(ASPECT_RATIO_VECTOR) / len(ASPECT_RATIO_VECTOR) - 0.06
 
         if ear < EYE_AR_THRESH:
             COUNTER += 1
