@@ -41,28 +41,32 @@
 
     <script>
         const currentDate = new Date()
+        const presentDate = new Date()
         let blinkData = []
 
         var prev = document.querySelector('#previous')
         prev.addEventListener('click', () => {
             currentDate.setDate(currentDate.getDate() - 1)
-            setData()
+            const datestring = currentDate.toISOString().slice(0, 10)
+            const currentData = blinkData[datestring]
+            if (currentData === undefined) {
+                alert("No data found")
+                currentDate.setDate(currentDate.getDate() + 1)
+            } else setData(currentData)
 
         })
         var next = document.querySelector('#next')
-        prev.addEventListener('click', () => {
+        next.addEventListener('click', () => {
             currentDate.setDate(currentDate.getDate() + 1)
-            setData()
-        })
-
-        function setData() {
             const datestring = currentDate.toISOString().slice(0, 10)
             const currentData = blinkData[datestring]
-            console.log(currentData)
             if (currentData === undefined) {
                 alert("No data found")
-                return
-            }
+                currentDate.setDate(currentDate.getDate() - 1)
+            } else setData(currentData)
+        })
+
+        function setData(currentData) {
             let data = Object.values(currentData).map((item) => item[0])
             let xlabel = Object.keys(currentData)
             renderChart(data, xlabel)
@@ -72,7 +76,11 @@
             const response = await fetch(url);
             const data = await response.json();
             blinkData = data
-            setData()
+            const datestring = presentDate.toISOString().slice(0, 10)
+            const currentData = blinkData[datestring]
+            if (currentData === undefined) {
+                alert("No data found")
+            } else setData(currentData)
         }
         getData()
 
@@ -110,6 +118,9 @@
                     name: "Blink Rate",
                     data: data
                 }],
+                noData: {
+                    text: 'Data not available'
+                },
                 markers: {
                     size: 6,
                     strokeWidth: 0,
