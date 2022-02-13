@@ -52,7 +52,7 @@
             if (currentData === undefined) {
                 alert("No data found")
                 currentDate.setDate(currentDate.getDate() + 1)
-            } else setData(currentData)
+            } else setData(currentData, 1)
 
         })
         var next = document.querySelector('#next')
@@ -63,13 +63,13 @@
             if (currentData === undefined) {
                 alert("No data found")
                 currentDate.setDate(currentDate.getDate() - 1)
-            } else setData(currentData)
+            } else setData(currentData, 1)
         })
 
-        function setData(currentData) {
+        function setData(currentData, x) {
             let data = Object.values(currentData).map((item) => item[0])
             let xlabel = Object.keys(currentData)
-            renderChart(data, xlabel)
+            renderChart(data, xlabel, x)
         }
         async function getData() {
             const url = `http://localhost:5000/`;
@@ -80,11 +80,11 @@
             const currentData = blinkData[datestring]
             if (currentData === undefined) {
                 alert("No data found")
-            } else setData(currentData)
+            } else setData(currentData, 0)
         }
         getData()
 
-        function renderChart(data, xlabel) {
+        function renderChart(data, xlabel, x = 0) {
             window.Apex = {
                 chart: {
                     foreColor: 'wheat',
@@ -145,6 +145,13 @@
             }
 
             var chart = new ApexCharts(document.querySelector('.graph'), lineGraph);
+            if (x == 1) {
+                chart.updateSeries([{
+                    name: "Blink Rate",
+                    data: data
+                }])
+                return
+            }
             chart.render();
 
         }
