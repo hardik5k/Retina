@@ -193,7 +193,7 @@ if BLINK_RATE <= NORMAL_RATE_MIN - 5:
 	curr_brightness=sbc.get_brightness()
 	new_brightness=int(curr_brightness*4/5)
 	sbc.set_brightness(new_brightness)
-	os.system('notify-send --urgency=LOW "Increase your blink rate! (Brightness reduced by 20%)" -i ~/Desktop/Retina/eye.ico')
+	os.system('notify-send --urgency=LOW "Please Blink! (Brightness reduced by 20%)" -i ~/Desktop/Retina/eye.ico')
     
 client = pymongo.MongoClient()
 mydb = client["BlinksDatabase"]
