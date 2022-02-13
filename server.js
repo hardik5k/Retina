@@ -1,13 +1,34 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const port = 5000;
+const port = 2000;
 app.use(cors())
 
-app.get('/', (req, res) => {
-    res.json(x)
-})
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+
+    var dbo = db.db("BlinksDatabase");
+    var blinkData = {}
+    dbo.collection("Blinkstats").find().toArray(function(err, result) {
+        if (err) throw err;
+
+        result.forEach((item) => {
+                if (blinkData[item.Date] !== undefined) {
+                    blinkData[item.Date][item.Time] = [item.BlinkRate, item.DrynessLevel]
+                } else {
+                    blinkData[item.Date] = {}
+                }
+            })
+        app.get('/', (req, res) => {
+            res.json(blinkData)
+        })
+
+        app.listen(port, () => {
+            console.log(`Example app listening on port ${port}`)
+        })
+        db.close();
+    });
+});
