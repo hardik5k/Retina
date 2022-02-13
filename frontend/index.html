@@ -58,9 +58,13 @@
         function setData() {
             const datestring = currentDate.toISOString().slice(0, 10)
             const currentData = blinkData[datestring]
-            if (currentData === undefined) alert("No data found")
-            let data = currentData.values().map((item) => item[0])
-            let xlabel = currentData.keys()
+            console.log(currentData)
+            if (currentData === undefined) {
+                alert("No data found")
+                return
+            }
+            let data = Object.values(currentData).map((item) => item[0])
+            let xlabel = Object.keys(currentData)
             renderChart(data, xlabel)
         }
         async function getData() {
