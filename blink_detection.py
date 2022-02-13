@@ -18,33 +18,34 @@ import logging
 import os
 
 
-resttime=10
+resttime = 10
 
-cur_dir=os.getcwd()
+cur_dir = os.getcwd()
 print(cur_dir)
 
 
-dirpath=os.path.dirname(os.path.realpath(__file__))
-filename=os.path.join(dirpath,'testlog.log')
+dirpath = os.path.dirname(os.path.realpath(__file__))
+filename = os.path.join(dirpath, 'testlog.log')
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-filehandler=logging.FileHandler(filename)
+filehandler = logging.FileHandler(filename)
 filehandler.setLevel(logging.INFO)
-filehandler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+filehandler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(levelname)s - %(message)s'))
 logger.addHandler(filehandler)
 
 
 def log_resttime(resttime):
-	with open('testlog.log', 'w'):
-    		pass
-	logger.info(resttime)
-
+    with open('testlog.log', 'w'):
+        pass
+    logger.info(resttime)
 
 
 now = datetime.now()
 start = now.strftime("%H:%M:%S")
+
 
 class Blink:
     def __init__(self, startTime, duration):
@@ -53,7 +54,7 @@ class Blink:
 
 
 STARTING_TIME = datetime.now()
-TOTAL_RUNNING_TIME = 15
+TOTAL_RUNNING_TIME = 180
 CURRENT_RUNNING_TIME = TOTAL_RUNNING_TIME
 STATE = "RUNNING"
 TOTAL_BLINKS = 0
@@ -85,7 +86,6 @@ def eyeAspectRatio(eye):
         p2    p3
     p1            p4 
         p6    p5
-
     '''
     # Each eye is represented by an array of above 6 points (p1 -> p6) in clockwise direction
     # Eye Aspect Ratio = (||p2 - p6|| + ||p3 - p5|| )/ 2 * ||p4 - p1||
@@ -103,11 +103,12 @@ def eyeAspectRatio(eye):
 
 # initialize dlib's face detector (HOG-based) and then create the facial landmark predictor
 
-#path=str(sys.argv[1])
-#print(path)
+# path=str(sys.argv[1])
+# print(path)
 print("INFO: loading facial landmark predictor...")
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("Desktop/Retina/shape_predictor_68_face_landmarks.dat")
+predictor = dlib.shape_predictor(
+    "Desktop/Retina/shape_predictor_68_face_landmarks.dat")
 
 # get indexes of the facial landmarks for the left and right eye
 (leftEyeStart, leftEyeEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
@@ -138,7 +139,7 @@ while True:
             PAUSE_START_TIME = datetime.now()
     else:
         if (STATE == "PAUSED" and getPauseDuration(PAUSE_START_TIME)):
-           break
+            break
         STATE = "RUNNING"
         face = faces[0]
         shape = predictor(gray, face)
@@ -181,18 +182,15 @@ while True:
     if key == ord("q"):
         break
 
-BLINK_RATE = TOTAL_BLINKS/TOTAL_RUNNING_TIME
+BLINK_RATE = (TOTAL_BLINKS/TOTAL_RUNNING_TIME)*60
 MIN_RATE = 2
 MAX_RATE = 35
 DRYNESS = 1 - (BLINK_RATE - MIN_RATE)/(MAX_RATE - MIN_RATE)
-
-Now = datetime.now()
-end = Now.strftime("%H:%M:%S")
-
 client = pymongo.MongoClient()
 mydb = client["BlinksDatabase"]
 mycol = mydb["Blinkstats"]
-mydict = {"Time ": start + " - " + end, "Date": str(date.today()), "BlinkRate": BLINK_RATE, "DrynessLevel": DRYNESS}
+mydict = {"Time": start, "Date": str(
+    date.today()), "BlinkRate": round(BLINK_RATE,2), "DrynessLevel": round(DRYNESS,2)}
 mycol.insert_one(mydict)
 cv2.destroyAllWindows()
 vs.stop()
