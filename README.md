@@ -14,6 +14,8 @@ sudo mv blink.sh /etc/profile.d
 
 (Make sure that that everything is extracted/cloned in ~/Desktop/Retina).
 
+Application demo video: https://www.youtube.com/watch?v=SeHKYsTJ9BM
+
 ## Tracks
 Healtcare, Task automation
 
